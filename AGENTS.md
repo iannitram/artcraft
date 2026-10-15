@@ -74,3 +74,13 @@ Organize for top-to-bottom reading. Important things first, details later.
 
   Not: `| Model | Configuration | Credits | Speed | Score |` packed tight
   with varying widths per row.
+
+## Agent skills
+
+### Issue tracker
+
+Reports are markdown files in the Software Depot's `apps/<App>/reports/`, not GitHub Issues. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
