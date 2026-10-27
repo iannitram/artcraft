@@ -17,8 +17,8 @@ ArtCraft is storytold's "IDE for artists": stage a scene by hand and generate fr
 |---|---|---|
 | The 95% feature list and a golden task per platform for the owner's real work | #3, #4 | keep on our fork (needs the owner) |
 | Which generation services are in scope and what they may cost | #6 | the owner's decision |
-| A Linux build | #5 | the owner's decision; upstream has Linux packaging in PR #2561 |
-| Batch download never overwrites (sibling sweep) | #2 | upstream PR #2549 covers the same: check it before building ours |
+| A Linux build | #5 | the owner's decision; upstream has Linux packaging in PR #2561 (still open 2026-10-26) |
+| Batch download never overwrites (sibling sweep) | #2 | upstream PR #2549 (still open 2026-10-26) covers the same: check it before building ours |
 | Tests in CI on Windows and macOS | build issue | send upstream |
 
 Upstream PRs need the owner's yes, one by one; no credit beyond the username (pinned issue #7).

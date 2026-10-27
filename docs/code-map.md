@@ -11,7 +11,7 @@ Upstream's Cargo workspace (`Cargo.toml` members) plus an Nx/TypeScript frontend
 | `frontend/` | Nx workspace: the Tauri app's TypeScript UI and libs | node; built into the Tauri app |
 | `crates/api_clients/artcraft/*` | `artcraft_api_defs`, `artcraft_client` (typed API calls), `artcraft_router` (routes jobs to ArtCraft, Midjourney or fal) | pure, all |
 | `crates/api_clients/*` (others) | Clients for fal, GMI Cloud, Grok, Kinovi, Midjourney, OpenAI Sora, World Labs | pure, all |
-| `crates/lib/*` | Shared helpers: client identity headers, browser emulation, cookie stores, Cloudflare handling, files and mimetypes, JWT, URL and UUID utils, errors, memory store | pure, all |
+| `crates/lib/*` | Shared helpers: build metadata, client identity headers, browser emulation, cookie stores, Cloudflare handling, files and mimetypes, JWT, URL and UUID utils, errors, memory store | pure, all |
 | `crates/schema/*` | SQLite task schema, public enums and tokens | all |
 | `crates/testing/*` | Test data and helpers | all |
 | `crates/vendor/tauri-plugin-http` | Vendored Tauri HTTP plugin | Tauri app only |
@@ -28,7 +28,7 @@ flowchart TD
   classDef later stroke-dasharray: 4 4
 ```
 
-The "coming soon" pages in `artcraft-native/src/shell.rs` (`Page::is_ready`) map to web-app paths; each build issue replaces one with a native page using the same client crates.
+The "coming soon" pages in `artcraft-native/src/shell.rs` (`Page::is_ready`) map to web-app paths; each build issue replaces one with a native page using the same client crates. On 2026-10-26 the pages present are Home, Create Image, Create Video, Create Audio and Library (`pages/`); still "coming soon" (placeholder in `pages/other.rs`): Create 3D Object (#12), Create World (#13), Edit Image (#14), 3D Stage (#15), Video Editor (#16); BG Remove and Frame Extract are not filed here because upstream has open PRs (#2577, #2573). Nothing was merged on 2026-10-25/26 beyond the pipeline docs.
 
 ## Mac, PC and Linux
 
