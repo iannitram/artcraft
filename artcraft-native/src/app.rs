@@ -954,3 +954,51 @@ fn file_name_for(item: &FeedItem) -> String {
   let ext = item.full_url.rsplit('.').next().filter(|e| e.len() <= 4 && e.chars().all(|c| c.is_ascii_alphanumeric())).unwrap_or(fallback);
   format!("artcraft_{}.{ext}", item.token)
 }
+
+#[cfg(test)]
+mod unique_destination_tests {
+  use super::unique_destination;
+  use std::path::{Path, PathBuf};
+
+  #[test]
+  fn a_free_name_is_used_as_it_is() {
+    let dir = tempfile::tempdir().unwrap();
+    assert_eq!(unique_destination(dir.path(), "artcraft_abc.png"), dir.path().join("artcraft_abc.png"));
+  }
+
+  #[test]
+  fn a_taken_name_gets_a_counter_before_the_extension() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::write(dir.path().join("artcraft_abc.png"), b"old").unwrap();
+    assert_eq!(unique_destination(dir.path(), "artcraft_abc.png"), dir.path().join("artcraft_abc (1).png"));
+    assert_eq!(std::fs::read(dir.path().join("artcraft_abc.png")).unwrap(), b"old");
+  }
+
+  #[test]
+  fn the_counter_goes_up_while_names_are_taken() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::write(dir.path().join("artcraft_abc.png"), b"old").unwrap();
+    std::fs::write(dir.path().join("artcraft_abc (1).png"), b"old").unwrap();
+    assert_eq!(unique_destination(dir.path(), "artcraft_abc.png"), dir.path().join("artcraft_abc (2).png"));
+  }
+
+  #[test]
+  fn a_name_without_an_extension_gets_the_counter_at_the_end() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::write(dir.path().join("README"), b"old").unwrap();
+    assert_eq!(unique_destination(dir.path(), "README"), dir.path().join("README (1)"));
+  }
+
+  #[cfg(unix)]
+  #[test]
+  fn a_symlink_counts_as_taken_and_its_target_is_untouched() {
+    let outside = tempfile::tempdir().unwrap();
+    let sentinel: PathBuf = outside.path().join("sentinel.png");
+    std::fs::write(&sentinel, b"sentinel").unwrap();
+    let dir = tempfile::tempdir().unwrap();
+    std::os::unix::fs::symlink(&sentinel, dir.path().join("artcraft_abc.png")).unwrap();
+    let chosen = unique_destination(dir.path(), "artcraft_abc.png");
+    assert_eq!(chosen, Path::new(dir.path()).join("artcraft_abc (1).png"));
+    assert_eq!(std::fs::read(&sentinel).unwrap(), b"sentinel");
+  }
+}
