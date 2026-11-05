@@ -2,6 +2,7 @@
 //! waiting for them and page requests to the services that fulfil them.
 
 use std::collections::{HashMap, HashSet};
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use egui::{Id, Ui};
@@ -460,8 +461,13 @@ impl ArtcraftApp {
       },
       many => {
         if let Some(dir) = rfd::FileDialog::new().pick_folder() {
+          // Never replace a file (or follow a link) already in the folder, and give two items
+          // with the same name distinct files.
+          let mut chosen: Vec<PathBuf> = Vec::new();
           for item in many {
-            self.backend.save_url(item.full_url.clone(), dir.join(file_name_for(item)));
+            let path = unique_destination_except(&dir, &file_name_for(item), &chosen);
+            chosen.push(path.clone());
+            self.backend.save_url_new(item.full_url.clone(), path);
           }
           for feed in self.feeds_mut() {
             feed.selecting = false;
@@ -953,6 +959,33 @@ fn file_name_for(item: &FeedItem) -> String {
   };
   let ext = item.full_url.rsplit('.').next().filter(|e| e.len() <= 4 && e.chars().all(|c| c.is_ascii_alphanumeric())).unwrap_or(fallback);
   format!("artcraft_{}.{ext}", item.token)
+}
+
+/// A path in `dir` for `name` that nothing exists at (not even a dangling symlink): `name` itself
+/// if free, else `stem (1).ext`, `stem (2).ext`, ... (a name without extension: `name (1)`).
+#[cfg(test)]
+fn unique_destination(dir: &Path, name: &str) -> PathBuf {
+  unique_destination_except(dir, name, &[])
+}
+
+/// [`unique_destination`], also skipping the paths in `taken` (given out earlier in the same batch).
+fn unique_destination_except(dir: &Path, name: &str, taken: &[PathBuf]) -> PathBuf {
+  let free = |path: &PathBuf| std::fs::symlink_metadata(path).is_err() && !taken.contains(path);
+  let first = dir.join(name);
+  if free(&first) {
+    return first;
+  }
+  let (stem, ext) = match name.rsplit_once('.') {
+    Some((stem, ext)) if !stem.is_empty() => (stem, Some(ext)),
+    _ => (name, None),
+  };
+  (1..)
+    .map(|n| match ext {
+      Some(ext) => dir.join(format!("{stem} ({n}).{ext}")),
+      None => dir.join(format!("{stem} ({n})")),
+    })
+    .find(free)
+    .expect("an unbounded counter reaches a free name")
 }
 
 #[cfg(test)]

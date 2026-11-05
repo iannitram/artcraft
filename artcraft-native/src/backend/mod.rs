@@ -710,13 +710,29 @@ impl Backend {
     });
   }
 
-  /// Downloads `url` to `path`.
+  /// Downloads `url` to `path`, replacing a file there (the user chose it in the save dialog).
   pub fn save_url(&self, url: String, path: PathBuf) {
+    self.download(url, path, false);
+  }
+
+  /// Downloads `url` to a new file at `path`: if anything exists there by the time it writes, the
+  /// download fails (a toast) and nothing is replaced. For batch downloads into a folder.
+  pub fn save_url_new(&self, url: String, path: PathBuf) {
+    self.download(url, path, true);
+  }
+
+  fn download(&self, url: String, path: PathBuf, create_new: bool) {
     let http = self.http.clone();
     self.spawn(move |tx| async move {
       let result = async {
         let bytes = http.get(&url).send().await.and_then(|r| r.error_for_status()).map_err(|e| e.to_string())?.bytes().await.map_err(|e| e.to_string())?;
-        tokio::fs::write(&path, &bytes).await.map_err(|e| e.to_string())
+        if create_new {
+          use tokio::io::AsyncWriteExt;
+          let mut file = tokio::fs::OpenOptions::new().write(true).create_new(true).open(&path).await.map_err(|e| e.to_string())?;
+          file.write_all(&bytes).await.map_err(|e| e.to_string())
+        } else {
+          tokio::fs::write(&path, &bytes).await.map_err(|e| e.to_string())
+        }
       }
       .await;
       match result {
