@@ -958,6 +958,7 @@ fn file_name_for(item: &FeedItem) -> String {
 #[cfg(test)]
 mod unique_destination_tests {
   use super::unique_destination;
+  #[cfg(unix)]
   use std::path::{Path, PathBuf};
 
   #[test]
