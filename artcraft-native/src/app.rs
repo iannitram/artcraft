@@ -989,6 +989,10 @@ fn unique_destination_except(dir: &Path, name: &str, taken: &[PathBuf]) -> PathB
 }
 
 #[cfg(test)]
+#[path = "download_tests.rs"]
+mod download_tests;
+
+#[cfg(test)]
 mod unique_destination_tests {
   use super::unique_destination;
   #[cfg(unix)]

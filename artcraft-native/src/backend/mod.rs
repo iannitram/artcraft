@@ -8,6 +8,9 @@ pub mod session;
 pub mod video;
 pub mod wire;
 
+#[cfg(test)]
+mod download_tests;
+
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
