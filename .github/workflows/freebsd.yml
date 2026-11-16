@@ -4,8 +4,7 @@ name: FreeBSD
 
 # The VM build is slow, so it runs nightly on main and on pushes to `release`, not on pull requests.
 on:
-  schedule:
-    - cron: "27 4 * * *"
+  # The nightly run (schedule, cron "27 4 * * *") is off in this fork; the upstream repository runs it.
   push:
     branches: [release]
   workflow_dispatch:
@@ -21,4 +20,3 @@ jobs:
   freebsd:
     # Intentionally tracked at @main (not SHA-pinned) so org-wide CI improvements, security fixes, and build optimizations propagate without PR churn across all craftapp repos.
     uses: storytold/craft-common-actions/.github/workflows/freebsd.yml@main
-
