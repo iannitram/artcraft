@@ -96,3 +96,5 @@ Organize for top-to-bottom reading. Important things first, details later.
 
   Not: `| Model | Configuration | Credits | Speed | Score |` packed tight
   with varying widths per row.
+
+**Upstream and peers:** see `PEERS.md` at the repo root. When I say "upstream", I mean the repo in its Upstream section; reuse a peer's code only as that file allows.
